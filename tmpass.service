@@ -1,0 +1,10 @@
+[Unit]
+Description = Temporary pass setter
+After = network.target getty@tty1.service
+
+[Service]
+ExecStart = python3 /usr/sbin/tmpass.py
+Restart = always
+
+[Install]
+WantedBy = multi-user.target
