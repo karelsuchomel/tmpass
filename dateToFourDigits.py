@@ -1,3 +1,4 @@
+# Generated date and time is in "local time" (not UTC)
 from datetime import datetime
 
 
