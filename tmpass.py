@@ -1,17 +1,19 @@
 import shlex, subprocess
 import os, sys
 from pathlib import Path
+import dateToFourDigits
+import array
 
 class LogoutSleeper:
 	def __init__(self, sleepTime, uid):
 		self.sleepTime = sleeTime
 		self.uid = uid
 		self.procKiller = None
-	
+
 	def __del__(self):
 		self.procKiller.kill()
 		self.procKiller.wait()
-	
+
 	def run(self):
 		args = shlex.split("sleep " + self.sleepTime + " ; pkill -KILL -u " + self.uid) # maybe -U is right one
 		self.procKiller = subprocess.Popen(args, shell=True, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
@@ -35,7 +37,7 @@ class PipeNotifier:
 			print("Failed to create FIFO: %s", e)
 		else:
 			self.fifo = open(self.fullPipePath, "r")
-			print "Path is created."
+			print("Path is created.")
 
 	def __del__(self):
 		close(self.fifo)
@@ -47,16 +49,29 @@ class PipeNotifier:
 			return True
 		else:
 			return False
-		
+
+def changePass(uid):
+	password = dateToFourDigits.get_current_password()
+	args = 'passwd $(getent passwd ' + uid + ' | cut -d: -f1)'
+	x = array.array('b')
+	x.frombytes((password+'\n'+password).encode())
+	passChanger = subprocess.run(args, shell=True, stdout=subprocess.PIPE, input=x)
+	print(password)
 
 def main():
-	notifier = PipeNotifier("/dev/shm/tmpass/", "tmpass_pipe", "1002")
+	if len(sys.argv) != 2:
+		print("Missing UID... usage: $ " + sys.argv[0] + " <UID>")
+		return 0
+	uid = sys.argv[1]
+
+	notifier = PipeNotifier("/dev/shm/tmpass/", "tmpass_pipe", str(uid))
 	killer = None
 	while notifier.read():
 		del killer
-		# TODO: change password
-		killer = LogoutSleeper(3600, 1002)
+		changePass(int(uid))
+		killer = LogoutSleeper(3600, int(uid))
+		killer.run()
 
 if __name__ == "__main__":
-    main()
+	main()
 
