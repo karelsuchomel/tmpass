@@ -1,38 +1,29 @@
-// We are using local time
-
-const get_current_password = () => {
+const convertToTwoDigitString = (number)=>{
+    if (number > 31) {
+        throw "You have supplied suspiciously large number";
+    }
+    const hourStr = String(number);
+    return hourStr.length < 1 ? 0 + hourStr : hourStr;
+};
+const getCurrentHours = ()=>{
     let date = new Date();
-  	date = date.now();
-    const current_hour = parseInt(date.getHours());
-    return date_to_four_digits(current_hour);
-}
-
-
-// valid password in the next hour
-const get_future_password = () => {
+    return date.getHours();
+};
+const get_current_password = ()=>{
+    return date_to_four_digit_password(getCurrentHours());
+};
+const get_future_password = ()=>{
+    const current_hour = (getCurrentHours() + 1) % 24;
+    return date_to_four_digit_password(current_hour);
+};
+const date_to_four_digit_password = (hour)=>{
     let date = new Date();
-  	date = date.now();
-    const current_hour = parseInt(date.getHours());
-    return date_to_four_digits((current_hour + 1) % 24);
-}
-
-
-const date_to_four_digits = (hour) => {
- 		let date = new Date();
-  	date = date.now();
-    const today = date.getDate() + date.getMonth() + date.getFullYear();
-
-    // Linear Congruential Generator
-    const a = 1140671485;
-    const c = 128201163;
+    const today = convertToTwoDigitString(date.getDate()) + convertToTwoDigitString(date.getMonth()) + date.getFullYear();
     const m = 2 ** 24;
-
-    const seed = parseInt(String(hour) + today);
-    const rand = (a * seed + c) % m;
-    const password = String(rand / m);
-
-    return password.substring(0, 15);
-}
-
-console.log(get_current_password())
-console.log(get_future_password())
+    const seed = parseInt(convertToTwoDigitString(hour) + today);
+    const rand = (1140671485 * seed + 128201163) % m;
+    const psw = parseFloat(String(rand / m)).toFixed(4);
+    return psw.substring(psw.length - 4, psw.length);
+};
+console.log(get_current_password());
+console.log(get_future_password());
