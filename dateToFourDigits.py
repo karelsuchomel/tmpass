@@ -24,6 +24,7 @@ def date_to_four_digits(hour):
     m = 2 ** 24
 
     seed = int(str(hour) + date)
+    print(seed)
     rand = (a * seed + c) % m
     result = float(rand / m)
 

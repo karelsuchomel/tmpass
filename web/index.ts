@@ -3,9 +3,9 @@ const convertToTwoDigitString = (number: number): string => {
     throw "You have supplied suspiciously large number";
   }
 
-  const hourStr = String(number);
+  const numStr = String(number);
 
-  return hourStr.length < 1 ? 0 + hourStr : hourStr;
+  return numStr.length === 1 ? ("0" + numStr) : numStr;
 };
 
 const getCurrentHours = (): number => {
@@ -29,7 +29,7 @@ const get_future_password = (): string => {
 const date_to_four_digit_password = (hour: number): string => {
   let date = new Date();
   const today = convertToTwoDigitString(date.getDate()) +
-    convertToTwoDigitString(date.getMonth()) + date.getFullYear();
+    convertToTwoDigitString(date.getMonth() + 1) + date.getFullYear();
 
   // Linear Congruential Generator
   const a = 1140671485;
@@ -43,5 +43,5 @@ const date_to_four_digit_password = (hour: number): string => {
   return psw.substring((psw.length - 4), psw.length);
 };
 
-console.log(get_current_password());
-console.log(get_future_password());
+// console.log(get_current_password());
+// console.log(get_future_password());
