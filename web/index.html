@@ -11,10 +11,21 @@
 
 </head>
 <body>
-	<h1>
-		TMPASS viewer
-	</h1>
-	<script src="index.ts"></script>
+	<header>
+		<h1>Podané ruce, heslo pro klientské počítače</h1>
+	</header>
+	<div class="current-password-card">
+		<span class="current-password-header">Současné heslo</span>
+		<span id="current-password"></span>
+		<div class="">
+			<div class="proportional-time-display">circle here</div>
+		</div>
+	</div>
+	<div class="future-password-card">
+		<span class="future-password-header">Současné heslo</span>
+		<span id="future-password"></span>
+	</div>
 
+	<script src="index.js"></script>
 </body>
 </html>

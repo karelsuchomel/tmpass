@@ -3,7 +3,6 @@ const convertToTwoDigitString = (number)=>{
         throw "You have supplied suspiciously large number";
     }
     const numStr = String(number);
-    console.log(numStr);
     return numStr.length === 1 ? "0" + numStr : numStr;
 };
 const getCurrentHours = ()=>{
@@ -22,10 +21,19 @@ const date_to_four_digit_password = (hour)=>{
     const today = convertToTwoDigitString(date.getDate()) + convertToTwoDigitString(date.getMonth() + 1) + date.getFullYear();
     const m = 2 ** 24;
     const seed = parseInt(convertToTwoDigitString(hour) + today);
-    console.log(seed);
     const rand = (1140671485 * seed + 128201163) % m;
     const psw = parseFloat(String(rand / m)).toFixed(4);
     return psw.substring(psw.length - 4, psw.length);
 };
-console.log(get_current_password());
-console.log(get_future_password());
+const renderCurrentPasswords = (currentPassword, futurePassword)=>{
+    const curPswEl = document.getElementById('current-password');
+    const futurePswEl = document.getElementById('future-password');
+    if (curPswEl && futurePswEl) {
+        curPswEl.innerText = currentPassword;
+        futurePswEl.innerText = futurePassword;
+    }
+};
+const initPasswordRendering = ()=>{
+    renderCurrentPasswords(get_current_password(), get_future_password());
+};
+initPasswordRendering();

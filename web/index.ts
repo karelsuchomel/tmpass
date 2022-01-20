@@ -13,8 +13,6 @@ const getCurrentHours = (): number => {
   return date.getHours();
 };
 
-//return convertToTwoDigitString(current_hour);
-
 // We are using local time
 const get_current_password = (): string => {
   return date_to_four_digit_password(getCurrentHours());
@@ -43,5 +41,24 @@ const date_to_four_digit_password = (hour: number): string => {
   return psw.substring((psw.length - 4), psw.length);
 };
 
-// console.log(get_current_password());
-// console.log(get_future_password());
+// Render passwords
+const renderCurrentPasswords = (currentPassword: string, futurePassword: string): void => {
+  const curPswEl = document.getElementById('current-password');
+  const futurePswEl = document.getElementById('future-password');
+
+  if(curPswEl && futurePswEl) {
+    curPswEl.innerText = currentPassword;
+    futurePswEl.innerText = futurePassword;
+  }
+
+};
+
+// Setup password rendering
+const initPasswordRendering = ():void => {
+  renderCurrentPasswords(
+    get_current_password(),
+    get_future_password()
+  );
+};
+
+initPasswordRendering();
