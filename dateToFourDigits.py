@@ -25,9 +25,10 @@ def date_to_four_digits(hour):
 
     seed = int(str(hour) + date)
     rand = (a * seed + c) % m
-    password = str(rand / m)
+    result = float(rand / m)
 
-    return password[14:]
+    password = '{:.4f}'.format(result)
+    return password[2:]
 
 
 if __name__ == '__main__':
