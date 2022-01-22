@@ -4,7 +4,7 @@ const jsClientProcess = Deno.run({
     "deno",
     "bundle",
     "-c",
-    "tsconfig.json",
+    "deno.json",
     "index.ts",
     "index.js",
     "--unstable",

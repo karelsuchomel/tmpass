@@ -9,8 +9,7 @@ const convertToTwoDigitString = (number: number): string => {
 };
 
 const getCurrentHours = (): number => {
-  let date = new Date();
-  return date.getHours();
+  return new Date().getHours();
 };
 
 // We are using local time
@@ -50,15 +49,39 @@ const renderCurrentPasswords = (currentPassword: string, futurePassword: string)
     curPswEl.innerText = currentPassword;
     futurePswEl.innerText = futurePassword;
   }
-
 };
 
-// Setup password rendering
-const initPasswordRendering = ():void => {
+const renderTicker = (): void => {
+  const tickerEl = document.getElementById('ticker');
+  const minutesText = document.getElementById('minutes-text');
+
+  if (tickerEl && minutesText) {
+    const date = new Date();
+    const minutes = date.getMinutes();
+
+    if (String(minutesText.innerHTML) !== String(minutes)) {
+      minutesText.innerHTML = String(60 - minutes);
+      const percentage = 100/60*minutes;
+      tickerEl.setAttribute('stroke-dasharray',  percentage + ", " + (100 - percentage));
+    }
+  }
+}
+
+const render = ():void => {
   renderCurrentPasswords(
     get_current_password(),
     get_future_password()
   );
+  renderTicker();
+}
+
+const initPasswordRendering = ():void => {
+  // initial render
+  render();
+
+  setInterval(() => {
+    render();
+  }, 1000);
 };
 
 initPasswordRendering();

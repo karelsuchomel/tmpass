@@ -6,8 +6,7 @@ const convertToTwoDigitString = (number)=>{
     return numStr.length === 1 ? "0" + numStr : numStr;
 };
 const getCurrentHours = ()=>{
-    let date = new Date();
-    return date.getHours();
+    return new Date().getHours();
 };
 const get_current_password = ()=>{
     return date_to_four_digit_password(getCurrentHours());
@@ -33,7 +32,27 @@ const renderCurrentPasswords = (currentPassword, futurePassword)=>{
         futurePswEl.innerText = futurePassword;
     }
 };
-const initPasswordRendering = ()=>{
+const renderTicker = ()=>{
+    const tickerEl = document.getElementById('ticker');
+    const minutesText = document.getElementById('minutes-text');
+    if (tickerEl && minutesText) {
+        const date = new Date();
+        const minutes = date.getMinutes();
+        if (String(minutesText.innerHTML) !== String(minutes)) {
+            minutesText.innerHTML = String(60 - minutes);
+            const percentage = 100 / 60 * minutes;
+            tickerEl.setAttribute('stroke-dasharray', percentage + ", " + (100 - percentage));
+        }
+    }
+};
+const render = ()=>{
     renderCurrentPasswords(get_current_password(), get_future_password());
+    renderTicker();
+};
+const initPasswordRendering = ()=>{
+    render();
+    setInterval(()=>{
+        render();
+    }, 1000);
 };
 initPasswordRendering();
