@@ -6,6 +6,9 @@ import subprocess
 import sys
 import stat
 import logging
+import datetime
+import time
+import _thread
 from pathlib import Path
 # This project imports:
 import dateToFourDigits
@@ -74,6 +77,16 @@ class PipeNotifier:
             return False
 
 
+def hour_scheduler(uid):
+    while True:
+        dt = datetime.datetime.now() + datetime.timedelta(hours=1)
+        dt = dt.replace(minute=0, second=0, microsecond=0)
+
+        time.sleep((dt - datetime.datetime.now()).total_seconds())
+        logger.debug("Run scheduled action: " + str(datetime.datetime.now()))
+        change_pass(str(uid))
+
+
 def change_pass(uid):
     password = dateToFourDigits.get_current_password()
     args = 'passwd $(getent passwd ' + uid + ' | cut -d: -f1)'
@@ -98,11 +111,11 @@ def main():
 
     notifier = PipeNotifier("/dev/shm/", "tmpass_pipe", str(uid))
     sleep_and_logout = LogoutSleeper(sleep_seconds, uid)
+    _thread.start_new_thread(hour_scheduler, (uid,))
     while True:
         if notifier.read_verify() is True:
             logger.info("New login.")
             sleep_and_logout.stop()
-            change_pass(str(uid))
             sleep_and_logout.run()
 
 if __name__ == "__main__":
