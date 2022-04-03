@@ -1,9 +1,10 @@
 [Unit]
-Description = Temporary pass setter
+Description = Temporary unix password setter
 After = network.target getty@tty1.service
 
 [Service]
-ExecStart = python3 /usr/sbin/tmpass.py
+EnvironmentFile = /etc/systemd/system/tmpass_environment
+ExecStart = /usr/sbin/tmpass.py
 Restart = always
 
 [Install]
