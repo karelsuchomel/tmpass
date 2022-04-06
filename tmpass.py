@@ -79,12 +79,14 @@ class PipeNotifier:
 
 def hour_scheduler(uid):
     while True:
+        change_pass(str(uid))
+      
         dt = datetime.datetime.now() + datetime.timedelta(hours=1)
         dt = dt.replace(minute=0, second=0, microsecond=0)
 
         time.sleep((dt - datetime.datetime.now()).total_seconds())
         logger.debug("Run scheduled action: " + str(datetime.datetime.now()))
-        change_pass(str(uid))
+        
 
 
 def change_pass(uid):
