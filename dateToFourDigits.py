@@ -21,7 +21,8 @@ def date_to_four_digits(hour):
     # Linear Congruential Generator
     a = 1140671485
     c = 128201163
-    m = 2 ** 24
+    # 2^24
+    m = 16777216
 
     seed = int(str(hour) + date)
     print(seed)

@@ -13,7 +13,6 @@ from pathlib import Path
 # This project imports:
 import dateToFourDigits
 
-
 # create logger
 logger = logging.getLogger('tmpass')
 logger.setLevel(logging.INFO)
@@ -39,6 +38,27 @@ class LogoutSleeper:
 
     def run(self):
         args = "sleep " + self.sleepTime + " && pkill -KILL -u " + self.uid  # FIXME: Maybe -U is right one
+        logger.info("Starting: " + str(args))
+        self.proc = subprocess.Popen(args, shell=True, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
+
+
+class UserNotificationSleeper:
+    def __init__(self, session_length):
+        self.sessionLength = int(session_length)
+        self.proc = None
+
+    def __del__(self):
+        self.stop()
+
+    def stop(self):
+        if not (self.proc is None):
+            self.proc.kill()
+            self.proc.wait()
+            self.proc = None
+
+    def run(self):
+        args = "sleep " + str(
+            self.sessionLength - 600) + " && notify-send \"10 minut do odhlášení\" && sleep 300 && notify-send \"5 minut do odhlášení\" && sleep 240 && notify-send \"1 minuta do odhlášení\""
         logger.info("Starting: " + str(args))
         self.proc = subprocess.Popen(args, shell=True, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
 
@@ -70,7 +90,7 @@ class PipeNotifier:
         line_process = subprocess.run("read -r line <" + self.fullPipePath + " && echo $line",
                                       shell=True, stdout=subprocess.PIPE)
         line = str(line_process.stdout, "utf-8")
-        logger.debug("line: " + line)
+        logger.info("line: " + line)
         if line == self.uid + "\n":
             return True
         else:
@@ -80,13 +100,12 @@ class PipeNotifier:
 def hour_scheduler(uid):
     while True:
         change_pass(str(uid))
-      
+
         dt = datetime.datetime.now() + datetime.timedelta(hours=1)
         dt = dt.replace(minute=0, second=0, microsecond=0)
 
         time.sleep((dt - datetime.datetime.now()).total_seconds())
-        logger.debug("Run scheduled action: " + str(datetime.datetime.now()))
-        
+        logger.info("Run scheduled action: " + str(datetime.datetime.now()))
 
 
 def change_pass(uid):
@@ -96,7 +115,7 @@ def change_pass(uid):
     x.frombytes((password + '\n' + password).encode())
     pass_changer = subprocess.run(args, shell=True, stdout=subprocess.PIPE, input=x)
     logger.info("Password changed...")
-    logger.debug("Password changed: " + password)
+    logger.info("Password changed: " + password)
 
 
 def main():
@@ -112,13 +131,17 @@ def main():
     logger.info("INIT ... uid: " + uid + " sleep_seconds: " + sleep_seconds)
 
     notifier = PipeNotifier("/dev/shm/", "tmpass_pipe", str(uid))
+    schedule_user_notifications = UserNotificationSleeper(sleep_seconds)
     sleep_and_logout = LogoutSleeper(sleep_seconds, uid)
     _thread.start_new_thread(hour_scheduler, (uid,))
     while True:
         if notifier.read_verify() is True:
             logger.info("New login.")
             sleep_and_logout.stop()
+            schedule_user_notifications.stop()
             sleep_and_logout.run()
+            schedule_user_notifications.run()
+
 
 if __name__ == "__main__":
     main()

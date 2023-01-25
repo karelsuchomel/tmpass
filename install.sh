@@ -11,7 +11,7 @@ then
     echo "Usage: "$0" <UID>"
     echo "<UID> ... UID of managed user"
     exit
-fi
+fisyhf
 
 # Create environment file
 echo 'TMPASS_MNG_USER='$1 | tee -a /etc/systemd/system/tmpass_environment
